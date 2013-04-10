@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+  </head>
+  <body>
+    <h2>Find address</h2>
+    <p>Enter an address or landmark name and hit 'Submit' to retrieve the GPS coordinates.</p>
+    <form action="/get_coordinates" method="post">
+      <div><label>Location name: <input type="text" name="gc_name" /></label></div>
+      <div><input type="submit" value="Submit"></div>
+    </form>
+
+    <div>
+      Results for '{{ gc_name }}':
+      <br/>
+      {{ gc_address }}
+    </div>
+  </body>
+</html>
