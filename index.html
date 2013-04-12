@@ -10,7 +10,7 @@
       <div><label>Twitter search term: <input type="text" name="search_term" value="{{ search_term }}" /></label></div>
       <div><input type="submit" value="Submit"></div>
     </form>
-
+    {% if search_term and location_name %}
     <p>
       Results for '{{ search_term }}' near '{{ location_name }}'...
     </p>
@@ -20,5 +20,6 @@
     <p>
       Tweets: {{ tweets }}
     </p>
+    {% endif %}
   </body>
 </html>
