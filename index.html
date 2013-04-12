@@ -10,10 +10,14 @@
       <div><input type="submit" value="Submit"></div>
     </form>
 
-    <div>
+    <p>
       Results for '{{ gc_name }}':
-      <br/>
-      {{ gc_address }}
-    </div>
+    </p>
+    <p>
+      GPS Coordinates: {{ gc_address['gps_coordinates'] }}
+    </p>
+    <p>
+      Formatted Address: {{ gc_address['address'] }}
+    </p>
   </body>
 </html>
