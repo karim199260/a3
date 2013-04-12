@@ -13,12 +13,12 @@ def search(search_terms):
 	url_params = urllib.urlencode(params)
 	result = urlfetch.fetch(url=url + '?' + url_params, 
 							method=urlfetch.GET)
+	
 	if result.status_code == 200:
 		item = json.loads(result.content)['results']
 		if (len(item) > 0):
-			return {
-				"gps_coordinates": item[0]['geometry']['location'],
-				"address": item[0]['formatted_address']
-			}
+			gps_coordinates = item[0]['geometry']['location']
+			address = item[0]['formatted_address']
+			return gps_coordinates
 		else:
 			return None

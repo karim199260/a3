@@ -3,21 +3,22 @@
     <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
   </head>
   <body>
-    <h2>Find address</h2>
-    <p>Enter an address or landmark name and hit 'Submit' to retrieve the GPS coordinates.</p>
+    <h2>Get the Buzz</h2>
+    <p>Enter an address and a term, and find out what the buzz around that term is on Twitter.</p>
     <form action="/get_coordinates" method="post">
-      <div><label>Location name: <input type="text" name="gc_name" /></label></div>
+      <div><label>Location name: <input type="text" name="location_name" value="{{ location_name }}" /></label></div>
+      <div><label>Twitter search term: <input type="text" name="search_term" value="{{ search_term }}" /></label></div>
       <div><input type="submit" value="Submit"></div>
     </form>
 
     <p>
-      Results for '{{ gc_name }}':
+      Results for '{{ search_term }}' near '{{ location_name }}'...
     </p>
     <p>
-      GPS Coordinates: {{ gc_address['gps_coordinates'] }}
+      GPS Coordinates: {{ location['lat'] }},{{ location['lng'] }}
     </p>
     <p>
-      Formatted Address: {{ gc_address['address'] }}
+      Tweets: {{ tweets }}
     </p>
   </body>
 </html>
