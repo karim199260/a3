@@ -19,25 +19,13 @@ def get_tweets(search_terms, geocode):
 
 	if result.status_code == 200:
 		items = json.loads(result.content)['results']
-		return [r['text'] for r in items]
-
-
-
-# class Employee(db.Model):
-#   name = db.StringProperty(required=True)
-#   role = db.StringProperty(required=True,
-#                            choices=set(["executive", "manager", "producer"]))
-#   hire_date = db.DateProperty()
-#   new_hire_training_completed = db.BooleanProperty(indexed=False)
-#   email = db.StringProperty()
-
-
-# e = Employee(name="John",
-#              role="manager",
-#              email=users.get_current_user().email())
-# e.hire_date = datetime.datetime.now().date()
-# e.put()
+		# return [r['text'] for r in items]
+		return items
 
 class Tweet(db.Model):
-	# id, text, from_user, from_user_name, Created_at, location
-	id = db.IntegerProperty(required=True)
+	text = db.StringProperty(required=True)
+	from_user = db.StringProperty(required=True)
+	profile_image_url = db.StringProperty(required=True)
+	created_at = db.DateTimeProperty(required=True)
+	location_name = db.StringProperty(required=True)	
+	search_term = db.StringProperty(required=True)

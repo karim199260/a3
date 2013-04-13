@@ -1,39 +1,63 @@
 import cgi
 import datetime
+import logging
+import time
 import urllib
 import webapp2
 import jinja2
 import os
 import buzz
 
+from google.appengine.ext import db
 from google.appengine.api import users
 
 import google_geocode
 import twitter
 
-
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
-
-cache = {}
-def get_tweets(search_term, location):
+def get_tweets(search_term, location, location_name):
 	'''gets the tweets for a given location_name, via google geocode + twitter (tweets are memoized)
 	:param location: the google geocode location coordinates
 	:param search_term: twitter is queried with this'''
-	# signature = (search_term, location['lat'], location['lng'])
-	# if signature not in cache:
-	# 	tweets = twitter.get_tweets(search_term, location)
-	# 	cache[signature] = tweets
-	# return cache[signature]
-	return twitter.get_tweets(search_term, location)
+	
+	# First, check whether tweets for this search term and location already exist in the db.
+	q = twitter.Tweet.all()
+	q.filter("location_name =", location_name)
+	q.filter("search_term =", search_term)
+	tweet_records = q.run(limit=10, read_policy=db.STRONG_CONSISTENCY)
+	tweet_records = list(tweet_records)
+
+	if len(tweet_records) > 0:
+		logging.info('using cached tweets')
+
+	# If they don't, fetch the tweets and put them in the db
+	if len(tweet_records) == 0:
+		logging.critical('no cached tweets; fetching new ones')
+		tweet_records = []
+		tweets = twitter.get_tweets(search_term, location)
+
+		for tweet in tweets:
+			# e.g. Sat, 13 Apr 2013 21:50:12 +0000
+			dt = datetime.datetime.strptime(tweet['created_at'],'%a, %d %b %Y %H:%M:%S +0000')
+			record = twitter.Tweet(	text=tweet['text'],
+									from_user=tweet['from_user'],
+									profile_image_url=tweet['profile_image_url'],
+									created_at=dt,
+									location_name=location_name,
+									search_term=search_term,
+									)
+			record.put()  # persist to the db
+			tweet_records.append(record)  # collect for immediate return
+
+	return tweet_records
+
 
 class MainPage(webapp2.RequestHandler):
 	def post(self):
 
 		location_name = self.request.get('Location name')
 		search_term = self.request.get('Search term')
-
-		import logging; logging.info(self.request)
 
 		context = {
 			'location_name': location_name,
@@ -45,9 +69,9 @@ class MainPage(webapp2.RequestHandler):
 		# If search terms entered, perform search
 		if location_name and search_term:
 			location = google_geocode.search(location_name)
-			tweets = get_tweets(search_term, location)
+			tweets = get_tweets(search_term, location, location_name)
 			context['location'] = location
-			context['tweets'] = tweets
+			context['tweets'] = [t.text for t in tweets]
 		else:
 			context['error'] = 'Please submit both the location name and the search term.'
 
