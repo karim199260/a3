@@ -54,6 +54,10 @@ def get_tweets(search_term, location, location_name):
 
 	return tweet_records
 
+# Let's use all three in the template:
+# search_term
+# location
+# buzz = ((1,'buzzword_1', (from_user, text, profile_image_url, )))
 
 class MainPage(webapp2.RequestHandler):
 	def post(self):
