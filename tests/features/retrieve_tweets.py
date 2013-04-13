@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
 from splinter import Browser
-from lettuce import *
+from lettuce import step, world
 import ipdb
 import urllib
 
-# world.browser = Browser('chrome')
 world.browser = Browser('zope.testbrowser')
+
+# Feature: Retrieve tweets
 
 @step(u'I go to the "(.*)" URL')
 def i_go_to_the_url(step, url):
