@@ -7,10 +7,10 @@
     {% if error %}
     <strong>{{ error }}</strong>
     {% endif %}
-    <p>Enter an address and a term, and find out what the buzz around that term is on Twitter.</p>
+    <p>Enter an address and a term, and find out what the buzz around that term and related terms is on Twitter.</p>
     <form action="/" method="post">
-      <div><label>Location name: <input type="text" name="Location name" id="location_name" value="{{ location_name }}" /></label></div>
-      <div><label>Twitter search term: <input type="text" name="Search term" id="search_term" value="{{ search_term }}" /></label></div>
+      <div><label>Location name: <input type="text" name="location_name" id="location_name" value="{{ location_name }}" /></label></div>
+      <div><label>Twitter search term: <input type="text" name="search_term" id="search_term" value="{{ search_term }}" /></label></div>
       <div><input name="Submit" type="submit" value="Submit"></div>
     </form>
     {% if search_term and location_name %}
@@ -21,7 +21,7 @@
       GPS Coordinates: {{ location['lat'] }},{{ location['lng'] }}
     </p>
     <p>
-      Tweets: {{ tweets }}
+      The buzz: {{ tweets }}
     </p>
     {% endif %}
   </body>

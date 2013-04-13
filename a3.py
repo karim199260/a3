@@ -65,24 +65,22 @@ buzz1 = {'rank': 1,
 			'profile_image_url':'the_url'},
 			{}, # another tweet
 			{}	# etc.
-			]
+			]}
 
 # The template will receive these:
-search_term = 'the_search_term'
-location = 'the_location'
-buzzes = [ buzz1, buzz2, ... ]
+# search_term = 'the_search_term'
+# location = 'the_location'
+buzzes = [ buzz1, buzz1 ]
 
 class MainPage(webapp2.RequestHandler):
 	def post(self):
 
-		location_name = self.request.get('Location name')
-		search_term = self.request.get('Search term')
+		location_name = self.request.get('location_name')
+		search_term = self.request.get('search_term')
 
 		context = {
 			'location_name': location_name,
-			'search_term': search_term,
-			'location': '',
-			'tweets': ''
+			'search_term': search_term
 		}
 
 		# If search terms entered, perform search
@@ -90,7 +88,7 @@ class MainPage(webapp2.RequestHandler):
 			location = google_geocode.search(location_name)
 			tweets = get_tweets(search_term, location, location_name)
 			context['location'] = location
-			context['tweets'] = [t.text for t in tweets]
+			context['buzzes'] = buzzes
 		else:
 			context['error'] = 'Please submit both the location name and the search term.'
 
