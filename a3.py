@@ -17,8 +17,10 @@ import twitter
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
 def get_tweets(search_term, location, location_name):
-	'''gets the tweets for a given location_name, via google geocode + twitter (tweets are memoized)
+	'''Gets the tweets for a given location. It tries the Google Datastore first; that failing,
+	it grabs new tweets from Twitter.
 	:param location: the google geocode location coordinates
+	:param location_name: the named location
 	:param search_term: twitter is queried with this'''
 	
 	# First, check whether tweets for this search term and location already exist in the db.
