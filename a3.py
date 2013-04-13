@@ -59,11 +59,13 @@ def get_tweets(search_term, location, location_name):
 buzz1 = {'rank': 1,
 		'buzzword': 'the_buzzword',
 		'sentiment': 'happy',
-		'tweets': {
-			'from_user':'the_user',
+		'tweets': [
+			{'from_user':'the_user',
 			'text':'the_text',
-			'profile_image_url':'the_url',
-		}
+			'profile_image_url':'the_url'},
+			{}, # another tweet
+			{}	# etc.
+			]
 
 # The template will receive these:
 search_term = 'the_search_term'
