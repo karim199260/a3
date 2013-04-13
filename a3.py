@@ -11,7 +11,13 @@ import twitter
 from google.appengine.ext import db
 from google.appengine.api import users
 
+from memoize import memo
+
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+
+@memo  # memoizes the function to db
+def get_tweets(search_term, location):
+	return twitter.get_tweets(search_term, location)
 
 
 class MainPage(webapp2.RequestHandler):
@@ -29,7 +35,7 @@ class MainPage(webapp2.RequestHandler):
 		# If search terms entered, perform search
 		if (len(location_name) and len(search_term)):
 			location = google_geocode.search(location_name)
-			tweets = twitter.get_tweets(search_term, location)
+			tweets = get_tweets(search_term, location)
 			template_values['location'] = location;
 			template_values['tweets'] = tweets;
 
