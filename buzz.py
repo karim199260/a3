@@ -1,4 +1,5 @@
 import re
+from collections import Counter
 
 # Assignment Text:
 
@@ -11,9 +12,18 @@ import re
 # "football" and "miami heats" as high frequency words in tweets. 
 
 
-def get_buzz(tweet_significant_words):
-	# TODO
-	pass
+def get_most_common_words(words_list, num_words):
+	""" gets n most common terms from a list words
+	:param words_list: array of individual words
+	:param num_words: number of top words to return
+	:returns: an array of words
+	"""
+
+	# TODO: Collapse synonyms based on this API: http://wikisynonyms.ipeirotis.com/page/api
+
+	most_common_words = [i[0] for i in Counter(words_list).most_common(num_words)]
+
+	return most_common_words
 
 
 def get_significant_words(tweet_body):
