@@ -12,7 +12,7 @@ RT_POLARITY_NEG_FILE = os.path.join(POLARITY_DATA_DIR, 'rt-polarity-neg.txt')
 
 
 #this function takes a feature selection mechanism and returns its performance in a variety of metrics
-def evaluate_features(feature_select):
+def evaluate_features(feature_select, word_list=None):
     posFeatures = []
     negFeatures = []
     #http://stackoverflow.com/questions/367155/splitting-a-string-into-words-and-punctuation
@@ -115,7 +115,7 @@ def best_word_features(words):
     return dict([(word, True) for word in words if word in best_words])
 
 
-def get_sentiment(*args, **kwargs):
+def get_sentiment(sentences):
     #numbers of features to select
     num = 15000
     print 'evaluating best %d word features' % (num)

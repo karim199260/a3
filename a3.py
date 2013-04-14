@@ -14,7 +14,6 @@ from google.appengine.api import users
 
 import buzz
 import google_geocode
-from sentiment.sentiment_analysis import get_sentiment
 import twitter
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -74,9 +73,15 @@ class MainPage(webapp2.RequestHandler):
 			tweets = get_tweets(search_term, location, location_name)
 			context['location'] = location
 
-			words = itertools.chain((buzz.get_significant_words(t.text) for t in tweets))
+			words = []
+			for t in tweets:
+				logging.info(t.text)
+				words.append(buzz.get_significant_words(t.text))
+			logging.info(words)
 			buzzwords = buzz.get_most_common_words(words_list=words, num_words=5)
 			logging.info(buzzwords)
+
+			from sentiment.sentiment_analysis import get_sentiment
 
 			buzzes = []
 			for i in range(len(buzzwords)):
