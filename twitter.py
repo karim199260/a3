@@ -11,10 +11,10 @@ def get_tweets(search_terms, geocode):
 	url = 'http://search.twitter.com/search.json'
 	params = {
 		'q': search_terms,
-		'geocode': str(geocode['lat']) + ',' + str(geocode['lng']) + ',100mi'
+		'geocode': str(geocode['lat']) + ',' + str(geocode['lng']) + ',200mi'
 	}
 	url_params = urllib.urlencode(params)
-	result = urlfetch.fetch(url=url + '?' + url_params, 
+	result = urlfetch.fetch(url=url + '?' + url_params,
 							method=urlfetch.GET)
 
 	if result.status_code == 200:

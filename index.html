@@ -14,9 +14,6 @@
 <body>
 	<div class="container">
 		<h2>Get the Buzz</h2>
-		{% if error %}
-			<strong>{{ error }}</strong>
-		{% endif %}
 		<p>Enter an address and a term, and find out what the buzz around that term and related terms is on Twitter.</p>
 		<form action="/" method="post" class="form-horizontal">
 			<div class="control-group">
@@ -35,6 +32,9 @@
 			</div>
 			<div class="control-group">
 				<div class="controls">
+					{% if error %}
+						<p class="text-error"><strong>{{ error }}</strong></p>
+					{% endif %}
 					<input name="Submit" type="submit" value="Get the Buzz" class="btn btn-primary" />
 				</div>
 			</div>
@@ -49,7 +49,7 @@
 					<th colspan="3">{{ b.rank }}. {{ b.buzzword }}  <em>( <span class="text-{{ b.info_class }}">{% if b.sentiment_hot %}very {% endif %}{{ b.sentiment_label }}</span> )</em></th>
 				</tr>
 				{% for t in b.tweets %}
-					<tr>
+					<tr data-neg="{{ t.neg }}" data-pos="{{ t.pos }}" data-neutral="{{ t.neutral }}">
 						<td><img src="{{ t.profile_image_url }}" alt="{{ t.from_user }}" /></td>
 						<td>{{ t.from_user }}</td>
 						<td>{{ t.text }}</td>
