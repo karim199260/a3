@@ -6,7 +6,7 @@ import os
 
 from google.appengine.ext import db
 from google.appengine.api import users
-from sentiment.text_processing import get_sentiment
+from sentiment.text_processing import sentiment, mean_sentiment
 
 import buzz
 import google_geocode
@@ -42,7 +42,7 @@ def get_tweets(search_term, location, location_name):
 			dt = datetime.datetime.strptime(tweet['created_at'],'%a, %d %b %Y %H:%M:%S +0000')
 
 			# Get the tweet's sentiment
-			sentiment = get_sentiment(tweet['text'])
+			sentiment = sentiment(tweet['text'])
 			
 			record = twitter.Tweet(	text=tweet['text'],
 									from_user=tweet['from_user'],
@@ -95,10 +95,15 @@ class MainPage(webapp2.RequestHandler):
 			for i in range(len(buzzwords)):
 				buzzword = buzzwords[i]
 				filtered_tweets = [t for t in tweets if buzzword in t.text]
+				label, prob, hot = mean_sentiment(filtered_tweets)
+
 				b = dict(
 					rank=i+1,
 					buzzword=buzzword,
 					tweets=filtered_tweets,
+					sentiment_label=label,
+					sentiment_prob=prob,
+					sentiment_hot=hot,
 					)
 				buzzes.append(b)
 

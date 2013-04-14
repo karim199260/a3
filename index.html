@@ -46,7 +46,7 @@
 			<tbody>
 			{% for b in buzzes %}
 				<tr>
-					<th colspan="3">{{ b.rank }}. {{ b.buzzword }} <span class="text-info">{{ b.sentiment }}</span></th>
+					<th colspan="3">{{ b.rank }}. {{ b.buzzword }} <span class="text-info">{% if b.sentiment_hot %}very {% endif %}{{ b.sentiment_label }}</span></th>
 				</tr>
 				{% for t in b.tweets %}
 					<tr>

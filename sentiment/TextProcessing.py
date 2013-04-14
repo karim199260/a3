@@ -1,6 +1,6 @@
 import sys
 import urllib
-# sys.path.append("mashape")
+sys.path.append("sentiment")
 
 from mashape.http.http_client import HttpClient
 from mashape.http.content_type import ContentType
