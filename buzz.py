@@ -21,7 +21,7 @@ def get_most_common_words(words_list, num_words):
 
 	# TODO: Collapse synonyms based on this API: http://wikisynonyms.ipeirotis.com/page/api
 
-	most_common_words = [i[0] for i in Counter(words_list).most_common(num_words)]
+	most_common_words = [i[0] for i in Counter(list(words_list)).most_common(num_words)]
 
 	return most_common_words
 
