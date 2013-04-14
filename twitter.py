@@ -29,3 +29,7 @@ class Tweet(db.Model):
 	created_at = db.DateTimeProperty(required=True)
 	location_name = db.StringProperty(required=True)	
 	search_term = db.StringProperty(required=True)
+	neg = db.FloatProperty(required=True)
+	pos = db.FloatProperty(required=True)
+	neutral = db.FloatProperty(required=True)
+	label = db.StringProperty(required=True)

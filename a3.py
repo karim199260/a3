@@ -1,18 +1,12 @@
-import cgi
 import datetime
-import itertools
 import logging
-import time
-import urllib
 import webapp2
 import jinja2
 import os
-import buzz
 
 from google.appengine.ext import db
 from google.appengine.api import users
-
-from sentiment.chatterbox import get_sentiment
+from sentiment.text_processing import get_sentiment
 
 import buzz
 import google_geocode
@@ -46,12 +40,20 @@ def get_tweets(search_term, location, location_name):
 		for tweet in tweets:
 			# e.g. Sat, 13 Apr 2013 21:50:12 +0000
 			dt = datetime.datetime.strptime(tweet['created_at'],'%a, %d %b %Y %H:%M:%S +0000')
+
+			# Get the tweet's sentiment
+			sentiment = get_sentiment(tweet['text'])
+			
 			record = twitter.Tweet(	text=tweet['text'],
 									from_user=tweet['from_user'],
 									profile_image_url=tweet['profile_image_url'],
 									created_at=dt,
 									location_name=location_name,
 									search_term=search_term,
+									pos=sentiment['probability']['pos'],
+									neg=sentiment['probability']['neg'],
+									neutral=sentiment['probability']['neutral'],
+									label=sentiment['label']
 									)
 			record.put()  # persist to the db
 			tweet_records.append(record)  # collect for immediate return
@@ -89,21 +91,14 @@ class MainPage(webapp2.RequestHandler):
 			buzzwords = buzz.get_most_common_words(words_list=words, num_words=5)
 			logging.info(buzzwords)
 
-			# from sentiment.sentiment_analysis import get_sentiment
-			
-
 			buzzes = []
 			for i in range(len(buzzwords)):
 				buzzword = buzzwords[i]
 				filtered_tweets = [t for t in tweets if buzzword in t.text]
-				buzz_tweets = [ dict(from_user=t.from_user, text=t.text, profile_image_url=t.profile_image_url) 
-								for t in filtered_tweets ]
-				sentences = [buzz.get_significant_words(t.text) for t in filtered_tweets]
 				b = dict(
 					rank=i+1,
 					buzzword=buzzword,
-					sentiment=get_sentiment(sentences=filtered_tweets),
-					tweets=buzz_tweets,
+					tweets=filtered_tweets,
 					)
 				buzzes.append(b)
 
