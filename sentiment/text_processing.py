@@ -2,14 +2,15 @@ from TextProcessing import TextProcessing
 
 client = TextProcessing("xslgc26CVzxMaUUF1QhmQASVgjGdY7Tj")
 
-def sentiment(text):
+def get_sentiment(text):
+	text = text.encode('utf-8').strip()
 	response = client.sentiment(text, language='english')
 	return vars(response)['body']
 
 def mean(l):
 	return float(sum(l))/len(l) if len(l) > 0 else float('nan')
 
-def mean_sentiment(tweets):
+def get_mean_sentiment(tweets):
 	pos = []
 	neg = []
 	neutral = []

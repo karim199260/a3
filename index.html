@@ -41,12 +41,12 @@
 		</form>
 		{% if buzzes %}
 		<hr />
-		<h3 class="text-info">Buzz found...</h3>
+		<h3 class="text-info">Buzz found for '{{ search_term }}' near '{{ location_name }}'...</h3>
 		<table class="table">
 			<tbody>
 			{% for b in buzzes %}
 				<tr>
-					<th colspan="3">{{ b.rank }}. {{ b.buzzword }} <span class="text-info">{% if b.sentiment_hot %}very {% endif %}{{ b.sentiment_label }}</span></th>
+					<th colspan="3">{{ b.rank }}. {{ b.buzzword }}  <em>( <span class="text-{{ b.info_class }}">{% if b.sentiment_hot %}very {% endif %}{{ b.sentiment_label }}</span> )</em></th>
 				</tr>
 				{% for t in b.tweets %}
 					<tr>

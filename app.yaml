@@ -1,4 +1,4 @@
-application: mini-hw-6-py
+application: cloud-computing-twitter-buzz
 version: 1
 runtime: python27
 api_version: 1
