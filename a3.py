@@ -12,6 +12,8 @@ import buzz
 from google.appengine.ext import db
 from google.appengine.api import users
 
+from sentiment.chatterbox import get_sentiment
+
 import buzz
 import google_geocode
 import twitter
@@ -37,7 +39,7 @@ def get_tweets(search_term, location, location_name):
 
 	# If they don't, fetch the tweets and put them in the db
 	if len(tweet_records) == 0:
-		logging.critical('no cached tweets; fetching new ones')
+		logging.debug('no cached tweets; fetching new ones')
 		tweet_records = []
 		tweets = twitter.get_tweets(search_term, location)
 
@@ -59,8 +61,8 @@ def get_tweets(search_term, location, location_name):
 class MainPage(webapp2.RequestHandler):
 	def post(self):
 
-		location_name = self.request.get('location_name')
-		search_term = self.request.get('search_term')
+		location_name = self.request.get('location_name').strip()
+		search_term = self.request.get('search_term').strip()
 
 		context = {
 			'location_name': location_name,
@@ -70,18 +72,25 @@ class MainPage(webapp2.RequestHandler):
 		# If search terms entered, perform search
 		if location_name and search_term:
 			location = google_geocode.search(location_name)
+
+			# User entered non-location
+			if not location:
+				context['error'] = 'Please enter an actual location.'
+				template = jinja_environment.get_template('index.html')
+				self.response.out.write(template.render(context))
+				return
+
 			tweets = get_tweets(search_term, location, location_name)
 			context['location'] = location
 
 			words = []
 			for t in tweets:
-				logging.info(t.text)
-				words.append(buzz.get_significant_words(t.text))
-			logging.info(words)
+				words.extend(buzz.get_significant_words(t.text))
 			buzzwords = buzz.get_most_common_words(words_list=words, num_words=5)
 			logging.info(buzzwords)
 
-			from sentiment.sentiment_analysis import get_sentiment
+			# from sentiment.sentiment_analysis import get_sentiment
+			
 
 			buzzes = []
 			for i in range(len(buzzwords)):
@@ -89,10 +98,11 @@ class MainPage(webapp2.RequestHandler):
 				filtered_tweets = [t for t in tweets if buzzword in t.text]
 				buzz_tweets = [ dict(from_user=t.from_user, text=t.text, profile_image_url=t.profile_image_url) 
 								for t in filtered_tweets ]
+				sentences = [buzz.get_significant_words(t.text) for t in filtered_tweets]
 				b = dict(
 					rank=i+1,
 					buzzword=buzzword,
-					sentiment=get_sentiment([t.text for t in filtered_tweets]),
+					sentiment=get_sentiment(sentences=filtered_tweets),
 					tweets=buzz_tweets,
 					)
 				buzzes.append(b)

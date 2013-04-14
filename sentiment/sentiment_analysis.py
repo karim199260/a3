@@ -4,7 +4,7 @@ from nltk.classify import util, NaiveBayesClassifier
 import nltk.metrics
 from nltk.metrics import BigramAssocMeasures
 from nltk.probability import FreqDist, ConditionalFreqDist
-
+import logging
 
 POLARITY_DATA_DIR = os.path.join('sentiment/polarityData', 'rt-polaritydata')
 RT_POLARITY_POS_FILE = os.path.join(POLARITY_DATA_DIR, 'rt-polarity-pos.txt')
@@ -12,7 +12,7 @@ RT_POLARITY_NEG_FILE = os.path.join(POLARITY_DATA_DIR, 'rt-polarity-neg.txt')
 
 
 #this function takes a feature selection mechanism and returns its performance in a variety of metrics
-def evaluate_features(feature_select, word_list=None):
+def evaluate_features(feature_select, best_words):
     posFeatures = []
     negFeatures = []
     #http://stackoverflow.com/questions/367155/splitting-a-string-into-words-and-punctuation
@@ -20,12 +20,12 @@ def evaluate_features(feature_select, word_list=None):
     with open(RT_POLARITY_POS_FILE, 'r') as posSentences:
         for i in posSentences:
             posWords = re.findall(r"[\w']+|[.,!?;]", i.rstrip())
-            posWords = [feature_select(posWords), 'pos']
+            posWords = [feature_select(posWords, best_words), 'pos']
             posFeatures.append(posWords)
     with open(RT_POLARITY_NEG_FILE, 'r') as negSentences:
         for i in negSentences:
             negWords = re.findall(r"[\w']+|[.,!?;]", i.rstrip())
-            negWords = [feature_select(negWords), 'neg']
+            negWords = [feature_select(negWords, best_words), 'neg']
             negFeatures.append(negWords)
 
     
@@ -53,40 +53,26 @@ def evaluate_features(feature_select, word_list=None):
     print 'accuracy:', nltk.classify.util.accuracy(classifier, testFeatures)
     classifier.show_most_informative_features(10)
 
+
 #creates a feature selection mechanism that uses all words
 def make_full_dict(words):
     return dict([(word, True) for word in words])
 
-#tries using all words as the feature selection mechanism
-print 'using all words as features'
-evaluate_features(make_full_dict)
-
-#scores words based on chi-squared test to show information gain (http://streamhacker.com/2010/06/16/text-classification-sentiment-analysis-eliminate-low-information-features/)
-def create_word_scores():
-    #creates lists of all positive and negative words
-    posWords = []
-    negWords = []
-    with open(RT_POLARITY_POS_FILE, 'r') as posSentences:
-        for i in posSentences:
-            posWord = re.findall(r"[\w']+|[.,!?;]", i.rstrip())
-            posWords.append(posWord)
-    with open(RT_POLARITY_NEG_FILE, 'r') as negSentences:
-        for i in negSentences:
-            negWord = re.findall(r"[\w']+|[.,!?;]", i.rstrip())
-            negWords.append(negWord)
-    posWords = list(itertools.chain(*posWords))
-    negWords = list(itertools.chain(*negWords))
+# scores words based on chi-squared test to show information gain 
+# (http://streamhacker.com/2010/06/16/text-classification-sentiment-analysis-eliminate-low-information-features/)
+def create_word_scores(sentences):
+    # logging.info(sentences)
+    words = list(itertools.chain(*sentences))
+    # logging.info(words)
 
     #build frequency distibution of all words and then frequency distributions of words within positive and negative labels
     word_fd = FreqDist()
     cond_word_fd = ConditionalFreqDist()
-    for word in posWords:
+    for word in words:
         word_fd.inc(word.lower())
         cond_word_fd['pos'].inc(word.lower())
-    for word in negWords:
-        word_fd.inc(word.lower())
         cond_word_fd['neg'].inc(word.lower())
-
+        
     #finds the number of positive and negative words, as well as the total number of words
     pos_word_count = cond_word_fd['pos'].N()
     neg_word_count = cond_word_fd['neg'].N()
@@ -101,8 +87,6 @@ def create_word_scores():
 
     return word_scores
 
-#finds word scores
-word_scores = create_word_scores()
 
 #finds the best 'number' words based on word scores
 def find_best_words(word_scores, number):
@@ -111,13 +95,17 @@ def find_best_words(word_scores, number):
     return best_words
 
 #creates feature selection mechanism that only uses best words
-def best_word_features(words):
+def best_word_features(words, best_words):
     return dict([(word, True) for word in words if word in best_words])
 
 
 def get_sentiment(sentences):
-    #numbers of features to select
+    word_scores = create_word_scores(sentences)
+    logging.info('WORD SCORES:')
+    # logging.info(word_scores)
     num = 15000
     print 'evaluating best %d word features' % (num)
     best_words = find_best_words(word_scores, num)
-    evaluate_features(best_word_features)
+    logging.info('BEST WORDS:')
+    # logging.info(best_words)
+    evaluate_features(feature_select=best_word_features, best_words=best_words)

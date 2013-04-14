@@ -23,7 +23,7 @@ def get_tweets(search_terms, geocode):
 		return items
 
 class Tweet(db.Model):
-	text = db.StringProperty(required=True)
+	text = db.StringProperty(multiline=True, required=True)
 	from_user = db.StringProperty(required=True)
 	profile_image_url = db.StringProperty(required=True)
 	created_at = db.DateTimeProperty(required=True)
