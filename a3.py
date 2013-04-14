@@ -11,7 +11,9 @@ import buzz
 from google.appengine.ext import db
 from google.appengine.api import users
 
+import buzz
 import google_geocode
+import sentiment
 import twitter
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -88,7 +90,29 @@ class MainPage(webapp2.RequestHandler):
 			location = google_geocode.search(location_name)
 			tweets = get_tweets(search_term, location, location_name)
 			context['location'] = location
+
+			words = []
+			for tweet in tweets:
+				words.extend(buzz.get_significant_words(tweet.text))
+			buzzwords = buzz.get_most_common_words(words_list=words, num_words=5)
+			logging.info(buzzwords)
+
+			buzzes = []
+			for i in range(len(buzzwords)):
+				buzzword = buzzwords[i]
+				filtered_tweets = [t for t in tweets if buzzword in t.text]
+				buzz_tweets = [ dict(from_user=t.from_user, text=t.text, profile_image_url=t.profile_image_url) 
+								for t in filtered_tweets ]
+				b = dict(
+					rank=i+1,
+					buzzword=buzzword,
+					sentiment=sentiment.get_sentiment([t.text for t in filtered_tweets]),
+					tweets=buzz_tweets,
+					)
+				buzzes.append(b)
+
 			context['buzzes'] = buzzes
+
 		else:
 			context['error'] = 'Please submit both the location name and the search term.'
 

@@ -50,6 +50,9 @@ def get_significant_words(tweet_body):
 		'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 
 		'should', 'now']
 
+	twitter_specific_stopwords = ['http', 'rt', 'co']
+	stopwords.extend(twitter_specific_stopwords)
+
 	#remove punctuation and split into individual words
 	words = re.findall(r'\w+', tweet_body.lower(), flags = re.UNICODE | re.LOCALE) 
 
