@@ -1,5 +1,6 @@
 import cgi
 import datetime
+import itertools
 import logging
 import time
 import urllib
@@ -13,7 +14,7 @@ from google.appengine.api import users
 
 import buzz
 import google_geocode
-import sentiment
+from sentiment.sentiment_analysis import get_sentiment
 import twitter
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -73,9 +74,7 @@ class MainPage(webapp2.RequestHandler):
 			tweets = get_tweets(search_term, location, location_name)
 			context['location'] = location
 
-			words = []
-			for tweet in tweets:
-				words.extend(buzz.get_significant_words(tweet.text))
+			words = itertools.chain((buzz.get_significant_words(t.text) for t in tweets))
 			buzzwords = buzz.get_most_common_words(words_list=words, num_words=5)
 			logging.info(buzzwords)
 
@@ -88,7 +87,7 @@ class MainPage(webapp2.RequestHandler):
 				b = dict(
 					rank=i+1,
 					buzzword=buzzword,
-					sentiment=sentiment.get_sentiment([t.text for t in filtered_tweets]),
+					sentiment=get_sentiment([t.text for t in filtered_tweets]),
 					tweets=buzz_tweets,
 					)
 				buzzes.append(b)
